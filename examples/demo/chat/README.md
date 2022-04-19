@@ -13,4 +13,4 @@ docker-compose -f ../../testing/docker-compose.yml up -d etcd nats
 go run main.go
 ```
 
-open browser => http://localhost:3251/web/
+open browser => http://localhost:3241/web/

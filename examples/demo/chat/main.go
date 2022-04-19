@@ -107,7 +107,7 @@ var app pitaya.Pitaya
 func main() {
 	conf := configApp()
 	builder := pitaya.NewDefaultBuilder(true, "chat", pitaya.Cluster, map[string]string{}, *conf)
-	builder.AddAcceptor(acceptor.NewWSAcceptor(":3250"))
+	builder.AddAcceptor(acceptor.NewWSAcceptor(":3240"))
 	builder.Groups = groups.NewMemoryGroupService(*config.NewDefaultMemoryGroupConfig())
 	app = builder.Build()
 
@@ -129,7 +129,7 @@ func main() {
 
 	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
 
-	go http.ListenAndServe(":3251", nil)
+	go http.ListenAndServe(":3241", nil)
 
 	app.Start()
 }
