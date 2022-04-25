@@ -15,15 +15,37 @@ Switch ($cmd)
     "run-cluster-grpc-example-connector" {
         cd examples/demo/cluster_grpc;
         go run main.go
+        break
     }
     "run-cluster-grpc-example-room" {
         cd examples/demo/cluster_grpc;
         go run main.go --port 3251 --rpcsvport 3435 --type room --frontend=false
+        break
+    }
+    "protos-compile-demo-worker" {
+        protoc -I examples/demo/worker/protos examples/demo/worker/protos/*.proto --go_out=.
+        break
+    }
+    "run-cluster-worker-example-room" {
+        cd examples/demo/worker;
+        go run main.go --type room --frontend=true
+        break
+    }
+    "run-cluster-worker-example-metagame" {
+        cd examples/demo/worker;
+        go run main.go --type metagame --frontend=false
+        break
+    }
+    "run-cluster-worker-example-worker" {
+        cd examples/demo/worker;
+        go run main.go --type worker --frontend=false
+        break
     }
     "protos-compile-demo" {
         protoc -I examples/demo/protos examples/demo/protos/*.proto --go_out=.
+        break
     }
-    "protos-compile"{
+    "protos-compile" {
         cd benchmark/testdata
         ./gen_proto.bat
         echo "build test.proto"
@@ -34,11 +56,12 @@ Switch ($cmd)
         #
         protoc -I pitaya-protos/test pitaya-protos/test/*.proto --go_out=. # protos/test
         echo "build out dir ./protos/test"
+        break
     }
     default {
         echo "help cmd, ex: .\make.ps1 setup";
         echo "  setup"
-        echo "  run-cluster-grpc-example-connector"
+        echo "  $cmd"
         break 
     }    
 }

@@ -30,6 +30,7 @@ func main() {
 
 	conf := viper.New()
 	conf.SetDefault("pitaya.worker.redis.url", "localhost:6379")
+	// conf.SetDefault("pitaya.worker.redis.password", "123abc")
 	conf.SetDefault("pitaya.worker.redis.pool", "3")
 
 	config := config.NewConfig(conf)
