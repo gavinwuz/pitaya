@@ -41,6 +41,16 @@ Switch ($cmd)
         go run main.go --type worker --frontend=false
         break
     }
+    "run-rate-limiting-example" {
+        cd examples/demo/rate_limiting;
+        go run main.go
+        break
+    }
+    "run-pipeline-example" {
+        cd examples/demo/pipeline;
+        go run main.go
+        break
+    }
     "protos-compile-demo" {
         protoc -I examples/demo/protos examples/demo/protos/*.proto --go_out=.
         break

@@ -4,11 +4,17 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
+	"os"
+	"time"
 
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/sirupsen/logrus"
 	"github.com/topfreegames/pitaya/v2"
 	"github.com/topfreegames/pitaya/v2/acceptor"
 	"github.com/topfreegames/pitaya/v2/component"
 	"github.com/topfreegames/pitaya/v2/config"
+	logruswrapper "github.com/topfreegames/pitaya/v2/logger/logrus"
 )
 
 // MetagameServer ...
@@ -87,12 +93,57 @@ func (g *MetagameServer) simpleAfter(ctx context.Context, resp interface{}, err 
 	return resp, err
 }
 
+type FileRotateLogHook struct {
+	rl *rotatelogs.RotateLogs
+}
+
+func InitLogger(logpath *string, name *string, level logrus.Level) {
+	l := logrus.New()
+	// l.Formatter = &logrus.TextFormatter{}
+	l.Formatter = &logrus.JSONFormatter{}
+	l.SetLevel(level)
+	//按天归档，保留14天日志
+	rl, _ := rotatelogs.New(
+		*logpath+"/"+*name+"_%Y-%m-%d.log",
+		rotatelogs.WithMaxAge(14*24*time.Hour),
+	)
+	//以旋转计数方式保留7个文件, WithMaxAge(-1)
+	// rl, _ := rotatelogs.New(
+	//     *logpath+"/"+*name+"_%Y-%m-%d.log",
+	//     rotatelogs.WithMaxAge(-1),
+	//     rotatelogs.WithRotationCount(7),
+	// )
+	h := &FileRotateLogHook{rl: rl}
+	l.AddHook(h)
+	mv := io.MultiWriter(os.Stdout, rl)
+	l.SetOutput(mv)
+	pitaya.SetLogger(logruswrapper.NewWithFieldLogger(l))
+}
+
+func (hook *FileRotateLogHook) Fire(entry *logrus.Entry) error {
+	// entry.Data["traceId"] = hook.TraceId
+	return nil
+}
+
+func (hook *FileRotateLogHook) Levels() []logrus.Level {
+	return logrus.AllLevels
+}
+
 var app pitaya.Pitaya
 
 func main() {
+	logpath := flag.String("logpath", ".", "set log save path")
 	svType := flag.String("type", "metagameDemo", "the server type")
 	isFrontend := flag.Bool("frontend", true, "if server is frontend")
+	debug := flag.Bool("debug", false, "turn on debug logging")
 	flag.Parse()
+
+	//增加定义日志
+	if *debug {
+		InitLogger(logpath, svType, logrus.DebugLevel)
+	} else {
+		InitLogger(logpath, svType, logrus.InfoLevel)
+	}
 
 	port := 3251
 	metagameServer := NewMetagameMock()
