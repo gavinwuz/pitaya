@@ -99,8 +99,8 @@ type FileRotateLogHook struct {
 
 func InitLogger(logpath *string, name *string, level logrus.Level) {
 	l := logrus.New()
-	// l.Formatter = &logrus.TextFormatter{}
-	l.Formatter = &logrus.JSONFormatter{}
+	l.Formatter = &logrus.TextFormatter{}
+	// l.Formatter = &logrus.JSONFormatter{}
 	l.SetLevel(level)
 	//按天归档，保留14天日志
 	rl, _ := rotatelogs.New(
