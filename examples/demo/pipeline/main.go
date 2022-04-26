@@ -6,15 +6,17 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
+	"path/filepath"
 
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	// rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
 	"github.com/topfreegames/pitaya/v2"
 	"github.com/topfreegames/pitaya/v2/acceptor"
 	"github.com/topfreegames/pitaya/v2/component"
 	"github.com/topfreegames/pitaya/v2/config"
+	"github.com/topfreegames/pitaya/v2/logger"
 	logruswrapper "github.com/topfreegames/pitaya/v2/logger/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // MetagameServer ...
@@ -94,7 +96,7 @@ func (g *MetagameServer) simpleAfter(ctx context.Context, resp interface{}, err 
 }
 
 type FileRotateLogHook struct {
-	rl *rotatelogs.RotateLogs
+	TraceId string
 }
 
 func InitLogger(logpath *string, name *string, level logrus.Level) {
@@ -103,17 +105,25 @@ func InitLogger(logpath *string, name *string, level logrus.Level) {
 	// l.Formatter = &logrus.JSONFormatter{}
 	l.SetLevel(level)
 	//按天归档，保留14天日志
-	rl, _ := rotatelogs.New(
-		*logpath+"/"+*name+"_%Y-%m-%d.log",
-		rotatelogs.WithMaxAge(14*24*time.Hour),
-	)
+	// rl, _ := rotatelogs.New(
+	// 	filepath.Join(*logpath, *name+"_%Y-%m-%d.log"),
+	// 	rotatelogs.WithMaxAge(14*24*time.Hour),
+	// )
 	//以旋转计数方式保留7个文件, WithMaxAge(-1)
 	// rl, _ := rotatelogs.New(
-	//     *logpath+"/"+*name+"_%Y-%m-%d.log",
+	//     filepath.Join(*logpath, *name+"_%Y-%m-%d.log"),
 	//     rotatelogs.WithMaxAge(-1),
 	//     rotatelogs.WithRotationCount(7),
 	// )
-	h := &FileRotateLogHook{rl: rl}
+
+	rl := &lumberjack.Logger{
+		Filename:   filepath.Join(*logpath, *name+".log"),
+		MaxSize:    1,    // 日志文件大小，单位是 MB
+		MaxBackups: 3,    // 最大过期日志保留个数
+		MaxAge:     28,   // 保留过期文件最大时间，单位 天
+		Compress:   true, // 是否压缩日志，默认是不压缩。这里设置为true，压缩日志
+	}
+	h := &FileRotateLogHook{}
 	l.AddHook(h)
 	mv := io.MultiWriter(os.Stdout, rl)
 	l.SetOutput(mv)
@@ -121,7 +131,7 @@ func InitLogger(logpath *string, name *string, level logrus.Level) {
 }
 
 func (hook *FileRotateLogHook) Fire(entry *logrus.Entry) error {
-	// entry.Data["traceId"] = hook.TraceId
+	entry.Data["traceId"] = hook.TraceId
 	return nil
 }
 
@@ -132,10 +142,10 @@ func (hook *FileRotateLogHook) Levels() []logrus.Level {
 var app pitaya.Pitaya
 
 func main() {
-	logpath := flag.String("logpath", ".", "set log save path")
+	logpath := flag.String("logpath", "./log", "set log save path")
 	svType := flag.String("type", "metagameDemo", "the server type")
 	isFrontend := flag.Bool("frontend", true, "if server is frontend")
-	debug := flag.Bool("debug", false, "turn on debug logging")
+	debug := flag.Bool("debug", true, "turn on debug logging")
 	flag.Parse()
 
 	//增加定义日志
@@ -163,6 +173,10 @@ func main() {
 	app.Register(metagameServer,
 		component.WithName("metagameHandler"),
 	)
+	for i := 1; i <= 1000; i++ {
+
+		logger.Log.Warn("test app start...")
+	}
 
 	app.Start()
 }
