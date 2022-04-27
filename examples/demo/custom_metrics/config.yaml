@@ -3,6 +3,7 @@ metrics:
     enabled: true
 pitaya:
   metrics:
+    game: pitaya_metrics
     prometheus:
       port: 9091
     custom:

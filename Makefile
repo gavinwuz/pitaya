@@ -21,10 +21,10 @@ run-cluster-example-frontend:
 	@PITAYA_METRICS_PROMETHEUS_PORT=9090 go run examples/demo/cluster/main.go
 
 run-cluster-protobuf-frontend-example:
-	@cd examples/demo/cluster_protobuf && go run main.go
+	@cd examples/demo/cluster && go run main.go
 
 run-cluster-protobuf-backend-example:
-	@cd examples/demo/cluster_protobuf && go run main.go --port 3251 --type room --frontend=false
+	@cd examples/demo/cluster && go run main.go --port 3251 --type room --frontend=false
 
 run-cluster-example-backend:
 	@PITAYA_METRICS_PROMETHEUS_PORT=9091 go run examples/demo/cluster/main.go --port 3251 --type room --frontend=false

@@ -12,6 +12,17 @@ Switch ($cmd)
         go get ./...
         break
     }
+    
+    "run-cluster-protobuf-frontend-example"{
+        cd examples/demo/cluster
+        go run main.go
+        break
+    }
+    "run-cluster-protobuf-backend-example"{
+        cd examples/demo/cluster
+        go run main.go --port 3251 --type room --frontend=false
+        break
+    }
     "run-cluster-grpc-example-connector" {
         cd examples/demo/cluster_grpc;
         go run main.go
