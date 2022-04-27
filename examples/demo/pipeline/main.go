@@ -14,7 +14,7 @@ import (
 	"github.com/topfreegames/pitaya/v2/acceptor"
 	"github.com/topfreegames/pitaya/v2/component"
 	"github.com/topfreegames/pitaya/v2/config"
-	"github.com/topfreegames/pitaya/v2/logger"
+	// "github.com/topfreegames/pitaya/v2/logger"
 	logruswrapper "github.com/topfreegames/pitaya/v2/logger/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -173,10 +173,5 @@ func main() {
 	app.Register(metagameServer,
 		component.WithName("metagameHandler"),
 	)
-	for i := 1; i <= 1000; i++ {
-
-		logger.Log.Warn("test app start...")
-	}
-
 	app.Start()
 }
