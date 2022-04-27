@@ -50,7 +50,13 @@ Switch ($cmd)
         cd examples/demo/pipeline;
         go run main.go
         break
+    }    
+    "run-custom-metrics-example"{
+        cd examples/demo/custom_metrics
+        go run main.go --port 3250
+        break
     }
+
     "protos-compile-demo" {
         protoc -I examples/demo/protos examples/demo/protos/*.proto --go_out=.
         break
